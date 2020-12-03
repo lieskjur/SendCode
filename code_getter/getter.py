@@ -3,6 +3,7 @@ import re
 import os
 from ..settings import Settings
 
+from .get_extra import *
 
 def escape_dquote(cmd):
     cmd = cmd.replace('\\', '\\\\')
@@ -53,6 +54,8 @@ class CodeGetter:
             return PythonCodeGetter(view)
         elif syntax == "julia":
             return JuliaCodeGetter(view)
+        elif syntax == "matlab":
+            return MatlabCodeGetter(view)
         else:
             return CodeGetter(view)
 
@@ -375,8 +378,66 @@ class JuliaCodeGetter(CodeGetter):
                     s = sublime.Region(s.begin(), line.end())
                     break
 
+        elif re.match(r"\s*#=", thiscmd) and not re.match(r".*=#\s*$", thiscmd):
+            indentation = re.match(r"^(\s*)", thiscmd).group(1)
+            endline = view.find(r"^" + indentation + r"=#", s.begin())
+            s = sublime.Region(s.begin(), view.line(endline.end()).end())
+        
+        elif re.match(r"\s*#>>", thiscmd) and not re.match(r".*#<<\s*$", thiscmd):
+            indentation = re.match(r"^(\s*)", thiscmd).group(1)
+            endline = view.find(r"^" + indentation + r"#<<", s.begin())
+            s = sublime.Region(s.begin(), view.line(endline.end()).end())
+
         else:
             s = self.forward_expand(s, pattern=r"[+\-*/](?=\s*$)")
+
+        return s
+
+
+class MatlabCodeGetter(CodeGetter):
+
+    def expand_line(self, s):
+
+        view = self.view
+        if view.score_selector(s.begin(), "string"):
+            return s
+
+        s_block = self.block_expand(s)
+        if s_block != s:
+            return s_block
+
+        thiscmd = view.substr(s)
+
+        keywords = [
+            "for", "while", "switch", "try", "if", "parfor",
+            "function"
+        ]
+        op_brkts = ['\(','\[','\{']
+        cl_brkts = ['\)','\]','\}']
+        
+        if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
+                re.match(r".*\bend\b\s*$", thiscmd)):
+            s = reversible_matching(self,s, keywords,['end'], prefix="^\s*")
+
+        elif re.match(r"^\s*%\{\s*$",thiscmd):
+            s = nested_skip(self,s,"^\s*%\{\s*$","%}")
+            # Nested unindented comment blocks
+            #   Specific to matlab because after block start,
+            #   there are further no non-white space characters allowed.
+        
+        elif re.findall(r"%>>", thiscmd):
+            s = nested_skip(self,s, "%>>","%<<")
+            # Nested fast forward
+            #   Finds matching stop symbol "%<<" to
+            #   start symbol "%>>" and lines between (including).
+
+        else:
+            s = reversible_matching(self,s, op_brkts,cl_brkts, prefix="[^%]")
+            # Matches brackets across multiple lines
+            #   Checks balance of "opening" or "closing" brackets on each line,
+            #   chooses direction acordingly, and selects matching lines.
+            
+            # s = self.forward_expand(s, pattern=r"[+\-*/](?=\s*$)")
 
         return s
 
