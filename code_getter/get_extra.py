@@ -1,7 +1,7 @@
 import re
 import sublime
 
-def filter(self,string,filter_comments=False):
+def filter(string,filter_comments=False):
     
     qm = ["\"","\'"]
 
@@ -25,17 +25,17 @@ def nested_skip( self,s, start,end, prefix="",suffix="" ):
         line = view.line(view.text_point(row, 0))
         line_string = view.substr(line)
 
-        line_string = filter(self,line_string)
+        line_string = filter(line_string)
         
         level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,start,suffix),line_string))
         level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,end,suffix),line_string))
         
         #print(row,": ",level)
-        row += 1
-
         if level == 0:
             s = sublime.Region(s.begin(), line.end())
             break
+
+        row += 1
 
     return s
 
