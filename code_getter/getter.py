@@ -420,7 +420,7 @@ class MatlabCodeGetter(CodeGetter):
             s = reversible_matching(self,s, keywords,['end'], prefix="^\s*")
 
         elif re.match(r"^\s*%\{\s*$",thiscmd):
-            s = nested_skip(self,s,"^\s*%\{\s*$","%}")
+            s = nested_skip(self,s,"%{","%}",prefix="^\s*",suffix="\s*$")
             # Nested unindented comment blocks
             #   Specific to matlab because after block start,
             #   there are further no non-white space characters allowed.
