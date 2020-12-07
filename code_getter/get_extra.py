@@ -8,7 +8,7 @@ def filter(self,string):
     for i in range(2): #colapse strings and char. arrays
         string = re.sub(r"(\W){0}[^{0}]*{0}".format(qm[i]),r"\1{0}{0}".format(qm[i]),string)
 
-    print(string)
+    #print(string)
     return string
 
 def nested_skip( self,s, start,end ):
@@ -36,7 +36,7 @@ def nested_skip( self,s, start,end ):
 
     return s
 
-def reversible_matching( self,s, up,dn, prefix="" ):
+def reversible_matching( self,s, up,dn, prefix="",suffix="" ):
     view = self.view
     row = view.rowcol(s.begin())[0]
     lastrow = view.rowcol(view.size())[0]
@@ -55,8 +55,8 @@ def reversible_matching( self,s, up,dn, prefix="" ):
         
         line_string = filter(self,line_string)
 
-        level += len(re.findall(r"{0}(?:{1})".format(prefix,up),line_string))
-        level -= len(re.findall(r"{0}(?:{1})".format(prefix,dn),line_string))
+        level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,up,suffix),line_string))
+        level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,dn,suffix),line_string))
         
         sign = (level > 0) - (level < 0)
         if sign:
