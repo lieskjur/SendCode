@@ -1,17 +1,14 @@
 import re
 import sublime
 
-def filter(string,filter_comments=False):
-    
+def collapse_quoted(string):
     qm = ["\"","\'"]
-
-    for i in range(2): #colapse strings and char. arrays
+    for i in range(2): #collapse strings and char. arrays
         string = re.sub(r"(\W){0}[^{0}]*{0}".format(qm[i]),r"\1{0}{0}".format(qm[i]),string)
-    
-    if filter_comments:
-        string = re.sub(r"(.*)%.*$",r"\1%",string)
+    return string
 
-    print(string)
+def filter_comments(string):
+    string = re.sub(r"(.*)%.*$",r"\1%",string)
     return string
 
 def nested_skip( self,s, start,end, prefix="",suffix="" ):
@@ -25,7 +22,7 @@ def nested_skip( self,s, start,end, prefix="",suffix="" ):
         line = view.line(view.text_point(row, 0))
         line_string = view.substr(line)
 
-        line_string = filter(line_string)
+        line_string = collapse_quoted(line_string)
         
         level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,start,suffix),line_string))
         level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,end,suffix),line_string))
@@ -56,7 +53,8 @@ def reversible_matching( self,s, up,dn, prefix="",suffix="" ):
         line = view.line(view.text_point(row, 0))
         line_string = view.substr(line)
         
-        line_string = filter(self,line_string,filter_comments=True)
+        line_string = collapse_quoted(line_string)
+        line_string = filter_comments(line_string)
 
         level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,up,suffix),line_string))
         level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,dn,suffix),line_string))
