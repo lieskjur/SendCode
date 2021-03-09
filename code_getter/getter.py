@@ -360,36 +360,21 @@ class JuliaCodeGetter(CodeGetter):
             "function", "macro", "if", "for", "while", "try", "module",
             "abstruct", "type", "struct", "immutable", "mutable"
         ]
-        if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) and
-                not re.match(r".*\bend\b\s*$", thiscmd)) or \
-                (re.match(r".*\b(?:begin|let|quote)\b\s*", thiscmd)):
-            indentation = re.match(r"^(\s*)", thiscmd).group(1)
-            endline = view.find(r"^" + indentation + r"\bend\b", s.begin())
-            s = sublime.Region(s.begin(), view.line(endline.end()).end())
+        op_brkts = ['\(','\[','\{']
+        cl_brkts = ['\)','\]','\}']
 
-        elif re.match(r"\s*\b(using|import|export)\b", thiscmd):
-            row = view.rowcol(s.begin())[0]
-            lastrow = view.rowcol(view.size())[0]
-            while row <= lastrow:
-                line = view.line(view.text_point(row, 0))
-                if re.match(r".*[:,]\s*$", view.substr(line)):
-                    row = row + 1
-                else:
-                    s = sublime.Region(s.begin(), line.end())
-                    break
+        if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
+                re.match(r".*\bend\b\s*$", thiscmd)):
+            s = reversible_matching(self,s, keywords,['end'], prefix="^\s*")
 
-        elif re.match(r"\s*#=", thiscmd) and not re.match(r".*=#\s*$", thiscmd):
-            indentation = re.match(r"^(\s*)", thiscmd).group(1)
-            endline = view.find(r"^" + indentation + r"=#", s.begin())
-            s = sublime.Region(s.begin(), view.line(endline.end()).end())
-        
-        elif re.match(r"\s*#>>", thiscmd) and not re.match(r".*#<<\s*$", thiscmd):
-            indentation = re.match(r"^(\s*)", thiscmd).group(1)
-            endline = view.find(r"^" + indentation + r"#<<", s.begin())
-            s = sublime.Region(s.begin(), view.line(endline.end()).end())
+        elif re.match(r"^\s*#\=\s*$",thiscmd):
+            s = nested_skip(self,s,"#=","=#",prefix="^\s*",suffix="\s*$")
+
+        elif re.findall(r"#>>", thiscmd):
+            s = nested_skip(self,s, "#>>","#<<")
 
         else:
-            s = self.forward_expand(s, pattern=r"[+\-*/](?=\s*$)")
+            s = reversible_matching(self,s, op_brkts,cl_brkts, prefix="[^#]")
 
         return s
 
