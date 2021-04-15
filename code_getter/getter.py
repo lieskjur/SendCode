@@ -363,11 +363,9 @@ class JuliaCodeGetter(CodeGetter):
         op_brkts = [r"\(",r"\[",r"\{"]
         cl_brkts = [r"\)",r"\]",r"\}"]
 
-        if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) \
-            and not re.match(r".*\bend\b\s*$", thiscmd)):
-            s = reversible_matching(self,s, keywords,"end", "#", prefix=r"^\s*")
+        s = reversible_matching(self,s, keywords,"end", "#")
 
-        elif re.match(r"^\s*#\=\s*$",thiscmd):
+        if re.match(r"^\s*#\=\s*$",thiscmd):
             s = nested_skip(self,s,"#=","=#",prefix=r"^\s*",suffix=r"\s*$")
 
         elif re.findall(r"#>>", thiscmd):

@@ -26,7 +26,7 @@ def nested_skip( self,s, start,end, prefix="",suffix="" ):
         
         level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,start,suffix),line_string))
         level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,end,suffix),line_string))
-        
+
         #print(row,": ",level)
         if level == 0:
             s = sublime.Region(s.begin(), line.end())
