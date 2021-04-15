@@ -394,11 +394,9 @@ class MatlabCodeGetter(CodeGetter):
         op_brkts = [r"\(",r"\[",r"\{"]
         cl_brkts = [r"\)",r"\]",r"\}"]
         
-        if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
-                re.match(r".*\bend\b\s*$", thiscmd)):
-            s = reversible_matching(self,s, keywords,"end", "%", prefix=r"^\s*")
+        s = reversible_matching(self,s, keywords+op_brkts,["end"]+cl_brkts, "#")
 
-        elif re.match(r"^\s*%\{\s*$",thiscmd):
+        if re.match(r"^\s*%\{\s*$",thiscmd):
             s = nested_skip(self,s,"%{","%}",prefix=r"^\s*",suffix=r"\s*$")
             # Nested unindented comment blocks
             #   Specific to matlab because after block start,
@@ -409,14 +407,6 @@ class MatlabCodeGetter(CodeGetter):
             # Nested fast forward
             #   Finds matching stop symbol "%<<" to
             #   start symbol "%>>" and lines between (including).
-
-        else:
-            s = reversible_matching(self,s, op_brkts,cl_brkts, "%", prefix="[^%]")
-            # Matches brackets across multiple lines
-            #   Checks balance of "opening" or "closing" brackets on each line,
-            #   chooses direction acordingly, and selects matching lines.
-            
-            # s = self.forward_expand(s, pattern=r"[+\-*/](?=\s*$)")
 
         return s
 
