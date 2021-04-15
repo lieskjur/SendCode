@@ -365,9 +365,9 @@ class JuliaCodeGetter(CodeGetter):
 
         s = reversible_matching(self,s, keywords+op_brkts,["end"]+cl_brkts, "#")
 
-        if re.match(r"^\s*#\=\s*$",thiscmd):
-            s = nested_skip(self,s,"#=","=#",prefix=r"^\s*",suffix=r"\s*$")
-        elif re.findall(r"#>>", thiscmd):
+        if re.search(r"#=",thiscmd):
+            s = nested_skip(self,s,"#=","=#")
+        elif re.search(r"#>>", thiscmd):
             s = nested_skip(self,s, "#>>","#<<")
 
         return s
