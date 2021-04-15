@@ -360,21 +360,21 @@ class JuliaCodeGetter(CodeGetter):
             "function", "macro", "if", "for", "while", "try", "module",
             "abstruct", "type", "struct", "immutable", "mutable"
         ]
-        op_brkts = ['\(','\[','\{']
-        cl_brkts = ['\)','\]','\}']
+        op_brkts = [r"\(",r"\[",r"\{"]
+        cl_brkts = [r"\)",r"\]",r"\}"]
 
         if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
                 re.match(r".*\bend\b\s*$", thiscmd)):
-            s = reversible_matching(self,s, keywords,['end'], prefix="^\s*")
+            s = reversible_matching(self,s, keywords,['end'], "#", prefix=r"^\s*")
 
         elif re.match(r"^\s*#\=\s*$",thiscmd):
-            s = nested_skip(self,s,"#=","=#",prefix="^\s*",suffix="\s*$")
+            s = nested_skip(self,s,"#=","=#",prefix=r"^\s*",suffix=r"\s*$")
 
         elif re.findall(r"#>>", thiscmd):
             s = nested_skip(self,s, "#>>","#<<")
 
         else:
-            s = reversible_matching(self,s, op_brkts,cl_brkts, prefix="[^#]")
+            s = reversible_matching(self,s, op_brkts,cl_brkts, "#")
 
         return s
 
@@ -397,15 +397,15 @@ class MatlabCodeGetter(CodeGetter):
             "for", "while", "switch", "try", "if", "parfor",
             "function"
         ]
-        op_brkts = ['\(','\[','\{']
-        cl_brkts = ['\)','\]','\}']
+        op_brkts = [r"\(",r"\[",r"\{"]
+        cl_brkts = [r"\)",r"\]",r"\}"]
         
         if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
                 re.match(r".*\bend\b\s*$", thiscmd)):
-            s = reversible_matching(self,s, keywords,['end'], prefix="^\s*")
+            s = reversible_matching(self,s, keywords,['end'], "%", prefix=r"^\s*")
 
         elif re.match(r"^\s*%\{\s*$",thiscmd):
-            s = nested_skip(self,s,"%{","%}",prefix="^\s*",suffix="\s*$")
+            s = nested_skip(self,s,"%{","%}",prefix=r"^\s*",suffix=r"\s*$")
             # Nested unindented comment blocks
             #   Specific to matlab because after block start,
             #   there are further no non-white space characters allowed.
@@ -417,7 +417,7 @@ class MatlabCodeGetter(CodeGetter):
             #   start symbol "%>>" and lines between (including).
 
         else:
-            s = reversible_matching(self,s, op_brkts,cl_brkts, prefix="[^%]")
+            s = reversible_matching(self,s, op_brkts,cl_brkts, "%", prefix="[^%]")
             # Matches brackets across multiple lines
             #   Checks balance of "opening" or "closing" brackets on each line,
             #   chooses direction acordingly, and selects matching lines.
