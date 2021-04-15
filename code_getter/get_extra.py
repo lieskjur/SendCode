@@ -56,8 +56,8 @@ def reversible_matching( self,s, up,dn, cmt_symb, prefix="",suffix="" ):
         line_string = collapse_quoted(line_string)
         line_string = filter_comments(line_string,cmt_symb)
 
-        level += len(re.findall(r"{0}(?:{1}){2}".format(prefix,up,suffix),line_string))
-        level -= len(re.findall(r"{0}(?:{1}){2}".format(prefix,dn,suffix),line_string))
+        level += len(re.findall(r"{0}({1}){2}".format(prefix,up,suffix),line_string))
+        level -= len(re.findall(r"{0}({1}){2}".format(prefix,dn,suffix),line_string))
         
         sign = (level > 0) - (level < 0)
         if sign:
