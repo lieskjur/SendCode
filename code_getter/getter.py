@@ -363,7 +363,7 @@ class JuliaCodeGetter(CodeGetter):
         op_brkts = [r"\(",r"\[",r"\{"]
         cl_brkts = [r"\)",r"\]",r"\}"]
 
-        s = reversible_matching(self,s, keywords+op_brkts,["end"]+cl_brkts, "#")
+        s = reversible_matching(self,s, keywords+op_brkts,[r"\bend\b"]+cl_brkts, "#")
 
         if re.search(r"#=",thiscmd):
             s = nested_skip(self,s,"#=","=#")
