@@ -402,7 +402,7 @@ class MatlabCodeGetter(CodeGetter):
         
         if (re.match(r"\s*\b(?:{})\b".format("|".join(keywords)), thiscmd) != \
                 re.match(r".*\bend\b\s*$", thiscmd)):
-            s = reversible_matching(self,s, keywords,['end'], "%", prefix=r"^\s*")
+            s = reversible_matching(self,s, keywords,"end", "%", prefix=r"^\s*")
 
         elif re.match(r"^\s*%\{\s*$",thiscmd):
             s = nested_skip(self,s,"%{","%}",prefix=r"^\s*",suffix=r"\s*$")

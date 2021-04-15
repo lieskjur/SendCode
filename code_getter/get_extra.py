@@ -41,9 +41,9 @@ def reversible_matching( self,s, up,dn, cmt_symb, prefix="",suffix="" ):
     row = view.rowcol(s.begin())[0]
     lastrow = view.rowcol(view.size())[0]
 
-    if len(up) >= 2:
+    if isinstance(up,list):
         up = "|".join(up)
-    if len(dn) >= 2:
+    if isinstance(dn,list):
         dn = "|".join(dn)
 
     level = 0
