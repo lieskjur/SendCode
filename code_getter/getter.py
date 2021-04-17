@@ -3,7 +3,7 @@ import re
 import os
 from ..settings import Settings
 
-from .get_extra import *
+from .get_extra import GetExtra
 
 def escape_dquote(cmd):
     cmd = cmd.replace('\\', '\\\\')
@@ -341,7 +341,7 @@ class PythonCodeGetter(CodeGetter):
         return s
 
 
-class JuliaCodeGetter(CodeGetter):
+class JuliaCodeGetter(CodeGetter,GetExtra):
 
     def expand_line(self, s):
         view = self.view
@@ -374,7 +374,7 @@ class JuliaCodeGetter(CodeGetter):
         return s
 
 
-class MatlabCodeGetter(CodeGetter):
+class MatlabCodeGetter(CodeGetter,GetExtra):
 
     def expand_line(self, s):
 
