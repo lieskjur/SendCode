@@ -357,13 +357,13 @@ class JuliaCodeGetter(CodeGetter):
         lastrow = view.rowcol(view.size())[0]
 
         keywords = [
-            "function", "macro", "if", "while", "try", "module",
+            "function", "for", "macro", "if", "while", "try", "module",
             "abstruct", "type", "struct", "immutable", "mutable"
         ]
         op_brkts = [r"\(",r"\[",r"\{"]
         cl_brkts = [r"\)",r"\]",r"\}"]
 
-        Keys = [ r"\b" + key + r"\b" for key in keywords ]+[r"^[^\[]*\bfor\b"]
+        Keys = [ r"^\s*\b" + key + r"\b" for key in keywords ]
         s = reversible_matching(self,s, Keys+op_brkts,[r"\bend\b"]+cl_brkts, "#")
 
         if re.search(r"#=",thiscmd):
