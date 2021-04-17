@@ -395,19 +395,20 @@ class MatlabCodeGetter(CodeGetter):
         op_brkts = [r"\(",r"\[",r"\{"]
         cl_brkts = [r"\)",r"\]",r"\}"]
         
+        Keys = [ r"\b" + key + r"\b" for key in keywords ]
         s = reversible_matching(self,s, keywords+op_brkts,["end"]+cl_brkts, "#")
 
         if re.match(r"^\s*%\{\s*$",thiscmd):
             s = nested_skip(self,s,"%{","%}",prefix=r"^\s*",suffix=r"\s*$")
             # Nested unindented comment blocks
-            #   Specific to matlab because after block start,
+            #   Specific to matlab because after a block starts,
             #   there are further no non-white space characters allowed.
         
         elif re.findall(r"%>>", thiscmd):
             s = nested_skip(self,s, "%>>","%<<")
             # Nested fast forward
-            #   Finds matching stop symbol "%<<" to
-            #   start symbol "%>>" and lines between (including).
+            #   Finds matching stop "%<<" and start "%>>" symbols
+            #   and sends lines between (including).
 
         return s
 
